@@ -7,9 +7,13 @@ import scala.annotation.tailrec
 object Math {
   def abs(n: Double) = if (n < 0) -n else n
 
-  def factorial(n: Int): Long = {
-    if (n == 0) 1
-    else n * factorial(n - 1)
+  def factorial(n: Int): Int = {
+    @tailrec
+    def loop(acc: Int, n: Int): Int = {
+      if (n == 0) acc
+      else loop(acc * n, n - 1)
+    }
+    loop(1, n)
   }
 
   @tailrec
