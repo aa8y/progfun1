@@ -32,4 +32,12 @@ class CurryTest extends FlatSpec with Matchers {
   "mrProduct()" should "return the same value as product() for the same arguments." in {
     assert(Curry.mrProduct(x => x)(1, 5) == Curry.product(x => x)(1, 5))
   }
+
+  "fixedPoint()" should "work for x = 1 + x/2." in {
+    assert(Math.ceil(Curry.fixedPoint(x => 1 + x / 2)(1.0D)) == 2.0D)
+  }
+
+  "sqrt(4)" should "be 2." in {
+    assert(Math.round(Curry.sqrt(4)) == 2L)
+  }
 }
