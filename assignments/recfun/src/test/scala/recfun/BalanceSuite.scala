@@ -1,8 +1,7 @@
 package recfun
 
-import org.scalatest.FunSuite
-
 import org.junit.runner.RunWith
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
@@ -24,4 +23,5 @@ class BalanceSuite extends FunSuite {
   test("balance: counting is not enough") {
     assert(!balance("())(".toList))
   }
+
 }
