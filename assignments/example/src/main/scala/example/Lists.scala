@@ -1,12 +1,8 @@
 package example
 
 
-import common._
-
-import scala.annotation.tailrec
-
-
 object Lists {
+
   /**
    * This method computes the sum of all elements in the list xs. There are
    * multiple techniques that can be used for implementing this method, and
@@ -28,12 +24,8 @@ object Lists {
    * @return The sum of all elements in `xs`
    */
   def sum(xs: List[Int]): Int = {
-    @tailrec
-    def loop(acc: Int, l: List[Int]): Int = {
-      if (l.isEmpty) acc
-      else loop(acc + l.head, l.tail)
-    }
-    loop(0, xs)
+    if (xs.isEmpty) 0
+    else xs.head + sum(xs.tail)
   }
 
   /**
@@ -50,15 +42,12 @@ object Lists {
    * @throws java.util.NoSuchElementException if `xs` is an empty list
    */
   def max(xs: List[Int]): Int = {
-    @tailrec
-    def loop(maxVal: Int, l: List[Int]): Int = {
-      if (l.isEmpty) maxVal
-      else if (maxVal < l.head) loop(l.head, l.tail)
-      else loop(maxVal, l.tail)
+    if (xs.isEmpty) throw new java.util.NoSuchElementException()
+    else if (xs.size == 1) xs.head
+    else {
+      val maxInTail = max(xs.tail)
+      if (xs.head > maxInTail) xs.head
+      else maxInTail
     }
-
-    if (xs.isEmpty) {
-      throw new NoSuchElementException("Cannot find the maximum in an empty list.")
-    } else loop(xs.head, xs.tail)
   }
 }
