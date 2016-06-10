@@ -1,9 +1,9 @@
 package recfun
 
-import org.scalatest.FunSuite
-
+import java.lang.IllegalArgumentException
 
 import org.junit.runner.RunWith
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
@@ -25,4 +25,13 @@ class CountChangeSuite extends FunSuite {
     assert(countChange(300,List(500,5,50,100,20,200,10)) === 1022)
   }
 
+	test("countChange: duplicate denominations should be ignored.") {
+    assert(countChange(4, List(1, 2, 1, 2)) === 3)
+  }
+
+  test("countChange: negative denominations are invalid.") {
+    intercept[IllegalArgumentException] {
+      countChange(4, List(-2, -1, 1, 2))
+    }
+  }
 }
