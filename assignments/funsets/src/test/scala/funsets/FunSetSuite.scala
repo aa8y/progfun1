@@ -110,5 +110,83 @@ class FunSetSuite extends FunSuite {
     }
   }
 
+  test("intersect contains common elements of each set") {
+    new TestSets {
+      val u12 = union(s1, s2)
+      val u23 = union(s2, s3)
+      val s = intersect(u12, u23)
 
+      assert(!contains(s, 1), "Intersect 1")
+      assert(contains(s, 2), "Intersect 2")
+      assert(!contains(s, 3), "Intersect 3")
+    }
+  }
+
+  test("diff contains elements which are in the first set but not in the second") {
+    new TestSets {
+      val u12 = union(s1, s2)
+      val d1 = diff(u12, s2)
+
+      assert(contains(d1, 1), "Diff 1")
+      assert(!contains(d1, 2), "Diff 2")
+
+      val u123 = union(u12, s3)
+      val d2 = diff(u123, s1)
+
+      assert(!contains(d2, 1), "Diff 1")
+      assert(contains(d2, 2), "Diff 2")
+      assert(contains(d2, 3), "Diff 3")
+    }
+  }
+
+  test("filter contains elements in the set which pass the filter condition") {
+    new TestSets {
+      val u123 = union(union(s1, s2), s3)
+      val f = filter(u123, x => x % 2 == 1)
+
+      assert(contains(f, 1), "Filter 1")
+      assert(!contains(f, 2), "Filter 2")
+      assert(contains(f, 3), "Filter 3")
+    }
+  }
+
+  test("forall returns true if all elements in a set pass a condition, else false") {
+    new TestSets {
+      val u13 = union(s1, s3)
+      val u123 = union(u13, s2)
+
+      assert(forall(u13, x => x % 2 == 1) === true, "For all 1")
+      assert(forall(u123, x => x % 2 == 1) === false, "For all 2")
+    }
+  }
+
+  test("exists returns false if no elements satisfy the given condition") {
+    new TestSets {
+      val u13 = union(s1, s3)
+
+      assert(exists(u13, x => x % 2 == 0) === false, "Exists 1")
+    }
+  }
+
+  test("exists returns true if even one element satisfies the given condition") {
+    new TestSets {
+      val u12 = union(s1, s2)
+
+      assert(exists(u12, x => x % 2 == 0) === true, "Exists 1")
+      assert(exists(u12, x => x % 2 == 1) === true, "Exists 2")
+    }
+  }
+
+  test("map modifies all elements of a set based on a given function") {
+    new TestSets {
+      val u123 = union(union(s1, s2), s3)
+      val m = map(u123, x => x * x)
+
+      assert(!contains(m, 1), "Map 1")
+      assert(contains(m, 2), "Map 2")
+      assert(!contains(m, 3), "Map 3")
+      assert(contains(m, 4), "Map 4")
+      assert(contains(m, 6), "Map 5")
+    }
+  }
 }
