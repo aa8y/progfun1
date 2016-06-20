@@ -177,16 +177,31 @@ class FunSetSuite extends FunSuite {
     }
   }
 
+  test("exists returns true if all elements satisfy the given condition") {
+    new TestSets {
+      val u13 = union(s1, s3)
+
+      assert(exists(u13, x => x % 2 == 1) === true, "Exists 1")
+    }
+  }
+
   test("map modifies all elements of a set based on a given function") {
     new TestSets {
       val u123 = union(union(s1, s2), s3)
-      val m = map(u123, x => x * x)
 
-      assert(!contains(m, 1), "Map 1")
-      assert(contains(m, 2), "Map 2")
-      assert(!contains(m, 3), "Map 3")
-      assert(contains(m, 4), "Map 4")
-      assert(contains(m, 6), "Map 5")
+      val m1 = map(u123, x => x * x)
+      assert(contains(m1, 1) === true, "map 1")
+      assert(contains(m1, 2) === false, "map 2")
+      assert(contains(m1, 3) === false, "map 3")
+      assert(contains(m1, 4) === true, "map 4")
+      assert(contains(m1, 9) === true, "map 5")
+
+      val m2 = map(u123, x => x * 2)
+      assert(contains(m2, 1) === false, "map 1")
+      assert(contains(m2, 2) === true, "map 2")
+      assert(contains(m2, 3) === false, "map 3")
+      assert(contains(m2, 4) === true, "map 4")
+      assert(contains(m2, 6) === true, "map 5")
     }
   }
 }
