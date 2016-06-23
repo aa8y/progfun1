@@ -1,14 +1,19 @@
-package org.coursera.progfun.week2
+package org.coursera.progfun.week3
+
+object intsets {
+}
 
 abstract class IntSet {
   def contains(x: Int): Boolean
 
   def incl(x: Int): IntSet
 
-  def union(that: IntSet): IntSet
+  def size: Int
+
+  def union(other: IntSet): IntSet
 }
 
-class NonEmpty(n: Int, left: IntSet, right: IntSet) extends IntSet {
+class NonEmpty(val n: Int, val left: IntSet = Empty, val right: IntSet = Empty) extends IntSet {
   def contains(x: Int): Boolean = {
     if (x < n) left contains x
     else if (x > n) right contains x
@@ -21,17 +26,33 @@ class NonEmpty(n: Int, left: IntSet, right: IntSet) extends IntSet {
     else this
   }
 
-  def union(that: IntSet): IntSet = ((left union right) union that) incl n
+  def size: Int = left.size + 1 + right.size
+
+  def union(other: IntSet): IntSet = ((left union right) union other) incl n
+
+  override def equals(other: Any): Boolean = other match {
+    case o: NonEmpty => o.n == this.n && o.left == this.left && o.right == this.right
+    case _ => false
+  }
 
   override def toString: String = s"{ $left $n $right }"
 }
 
-object Empty extends IntSet {
+class Empty extends IntSet {
   def contains(x: Int): Boolean = false
 
-  def incl(x: Int): IntSet = new NonEmpty(x, Empty, Empty)
+  def incl(x: Int): IntSet = new NonEmpty(x)
 
-  def union(that: IntSet): IntSet = that
+  def size: Int = 0
+
+  def union(other: IntSet): IntSet = other
+
+  override def equals(other: Any): Boolean = other match {
+    case o: Empty => true
+    case _ => false
+  }
 
   override def toString: String = "."
 }
+
+object Empty extends Empty
