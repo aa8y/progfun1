@@ -1,8 +1,6 @@
 package org.coursera.progfun.week2
 
-
 import org.scalatest.{FlatSpec, Matchers}
-
 
 class CurryTest extends FlatSpec with Matchers {
   "sum()" should "work for an identity function." in {

@@ -1,10 +1,8 @@
 package org.coursera.progfun.week2
 
-
-import org.coursera.progfun.week1.Math.abs
-
 import scala.annotation.tailrec
 
+import org.coursera.progfun.week1.Math.abs
 
 object Curry {
   def sum(f: Int => Int)(a: Int, b: Int): Int = {
