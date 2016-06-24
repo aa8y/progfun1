@@ -133,7 +133,7 @@ class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet {
     right.filterAcc(p, left.filterAcc(p, newAcc))
   }
 
-  def union(that: TweetSet): TweetSet = left.union(right).union(that).incl(elem)
+  def union(that: TweetSet): TweetSet = left.union(right.union(that)).incl(elem)
 
   def mostRetweeted: Tweet = {
     if (left == Empty && right == Empty) elem
@@ -208,7 +208,7 @@ class Cons(val head: Tweet, val tail: TweetList) extends TweetList {
 object GoogleVsApple {
   val google = List("android", "Android", "galaxy", "Galaxy", "nexus", "Nexus")
   val apple = List("ios", "iOS", "iphone", "iPhone", "ipad", "iPad")
-  val allTweets = TweetReader.allTweets
+  lazy val allTweets = TweetReader.allTweets
 
   private def contains(keywords: List[String], tweet: Tweet): Boolean = {
     keywords.foldLeft(false)((toFilter, keyword) => toFilter || tweet.text.contains(keyword))
