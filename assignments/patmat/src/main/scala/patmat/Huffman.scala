@@ -27,12 +27,12 @@ object Huffman {
     case Leaf(_, weight) => weight
     case Fork(_, _, _, weight) => weight
   }
-  
+
   def chars(tree: CodeTree): List[Char] = tree match {
     case Leaf(char, _) => List(char)
     case Fork(_, _, chars, _) => chars
   }
-  
+
   def makeCodeTree(left: CodeTree, right: CodeTree) = {
     Fork(left, right, chars(left) ::: chars(right), weight(left) + weight(right))
   }
@@ -75,7 +75,7 @@ object Huffman {
   def times(chars: List[Char]): List[(Char, Int)] = {
     chars.groupBy(c => c).toList.map { case (c, l) => (c, l.size) }
   }
-  
+
   /**
    * Returns a list of `Leaf` nodes for a given frequency table `freqs`.
    *
@@ -86,12 +86,12 @@ object Huffman {
   def makeOrderedLeafList(freqs: List[(Char, Int)]): List[Leaf] = {
     freqs.sortBy(_._2).map { case (c, w) => Leaf(c, w) }
   }
-  
+
   /**
    * Checks whether the list `trees` contains only one single code tree.
    */
   def singleton(trees: List[CodeTree]): Boolean = trees.size == 1
-  
+
   /**
    * The parameter `trees` of this function is a list of code trees ordered
    * by ascending weights.
@@ -113,7 +113,7 @@ object Huffman {
       }
     case _ => trees
   }
-  
+
   /**
    * This function will be called in the following way:
    *
@@ -132,13 +132,13 @@ object Huffman {
    *  - try to find sensible parameter names for `xxx`, `yyy` and `zzz`.
    */
   def until(
-    singleton: List[CodeTree] => Boolean, 
+    singleton: List[CodeTree] => Boolean,
     combine: List[CodeTree] => List[CodeTree]
   )(trees: List[CodeTree]): List[CodeTree] = {
     if (singleton(trees)) trees
     else until(singleton, combine)(combine(trees))
   }
-  
+
   /**
    * This function creates a code tree which is optimal to encode the text `chars`.
    *
@@ -164,13 +164,13 @@ object Huffman {
         if (bits.isEmpty) acc
         else if (bits.head == 0) decodeChar(left, bits.tail, acc)
         else decodeChar(right, bits.tail, acc)
-      case Leaf(char, _) => 
+      case Leaf(char, _) =>
         if (bits.isEmpty) char :: acc
-        else char :: decode(tree, bits.tail)
+        else char :: decode(tree, bits)
     }
     decodeChar(tree, bits, Nil)
   }
-  
+
   /**
    * A Huffman coding tree for the French language.
    * Generated from the data given at
@@ -194,10 +194,21 @@ object Huffman {
    * This function encodes `text` using the code tree `tree`
    * into a sequence of bits.
    */
-  def encode(tree: CodeTree)(text: List[Char]): List[Bit] = ???
-  
-  // Part 4b: Encoding using code table
+  def encode(tree: CodeTree)(text: List[Char]): List[Bit] = {
+    def encodeChar(subTree: CodeTree, char: Char, acc: List[Bit]): List[Bit] = subTree match {
+      case Fork(left, right, chars, _) if (chars.contains(char)) =>
+        val leftCode = encodeChar(left, char, 0 :: acc)
+        val rightCode = encodeChar(right, char, 1 :: acc)
+        if (leftCode == acc) rightCode else leftCode
+      case Leaf(leafChar, _) if (leafChar == char) => acc
+      case _ => acc.tail
+    }
+    text.foldLeft(List[Bit]()) { (partCode, char) =>
+      partCode ::: encodeChar(tree, char, Nil).reverse
+    }
+  }
 
+  // Part 4b: Encoding using code table
   type CodeTable = List[(Char, List[Bit])]
 
   /**
@@ -205,7 +216,7 @@ object Huffman {
    * the code table `table`.
    */
     def codeBits(table: CodeTable)(char: Char): List[Bit] = ???
-  
+
   /**
    * Given a code tree, create a code table which contains, for every character in the
    * code tree, the sequence of bits representing that character.
@@ -215,14 +226,14 @@ object Huffman {
    * sub-trees, think of how to build the code table for the entire tree.
    */
     def convert(tree: CodeTree): CodeTable = ???
-  
+
   /**
    * This function takes two code tables and merges them into one. Depending on how you
    * use it in the `convert` method above, this merge method might also do some transformations
    * on the two parameter code tables.
    */
     def mergeCodeTables(a: CodeTable, b: CodeTable): CodeTable = ???
-  
+
   /**
    * This function encodes `text` according to the code tree `tree`.
    *

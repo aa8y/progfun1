@@ -13,6 +13,44 @@ class HuffmanSuite extends FunSuite {
 		val t1 = Fork(Leaf('a',2), Leaf('b',3), List('a','b'), 5)
 		val t2 = Fork(Fork(Leaf('a',2), Leaf('b',3), List('a','b'), 5), Leaf('d',4), List('a','b','d'), 9)
 	}
+  trait ExampleTree {
+    val egCode = Fork(
+      left = Leaf('a', 8),
+      right = Fork(
+        left = Fork(
+          left = Leaf('b', 3),
+          right = Fork(
+            left = Leaf('c', 1),
+            right = Leaf('d', 1),
+            chars = List('c', 'd'),
+            weight = 2
+          ),
+          chars = List('b', 'c', 'd'),
+          weight = 5
+        ),
+        right = Fork(
+          left = Fork(
+            left = Leaf('e', 1),
+            right = Leaf('f', 1),
+            chars = List('e', 'f'),
+            weight = 2
+          ),
+          right = Fork(
+            left = Leaf('g', 1),
+            right = Leaf('h', 1),
+            chars = List('g', 'h'),
+            weight = 2
+          ),
+          chars = List('e', 'f', 'g', 'h'),
+          weight = 4
+        ),
+        chars = List('b', 'c', 'd', 'e', 'f', 'g', 'h'),
+        weight = 9
+      ),
+      chars = List('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'),
+      weight = 17
+    )
+  }
 
   test("weight of a larger tree") {
     new TestTrees {
@@ -47,6 +85,25 @@ class HuffmanSuite extends FunSuite {
   test("decode and encode a very short text should be identity") {
     new TestTrees {
       assert(decode(t1, encode(t1)("ab".toList)) === "ab".toList)
+    }
+  }
+
+  test("decode with example tree should do single character decoding") {
+    new ExampleTree {
+      assert(decode(egCode, List(0)) === List('a'))
+      assert(decode(egCode, List(1, 0, 0)) === List('b'))
+    }
+  }
+
+  test("decode with example tree should do two character decoding") {
+    new ExampleTree {
+      assert(decode(egCode, List(0, 1, 0, 0)) === List('a', 'b'))
+    }
+  }
+
+  test("decode with example tree should decode 10001010 to bac") {
+    new ExampleTree {
+      assert(decode(egCode, List(1, 0, 0, 0, 1, 0, 1, 0)) === List('b', 'a', 'c'))
     }
   }
 }
