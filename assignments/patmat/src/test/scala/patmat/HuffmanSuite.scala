@@ -51,6 +51,9 @@ class HuffmanSuite extends FunSuite {
       weight = 17
     )
   }
+  trait PersonalTree {
+    val tinyTree = Fork(Leaf('a', 1), Leaf('b', 1), List('a', 'b'), 2)
+  }
 
   test("weight of a larger tree") {
     new TestTrees {
@@ -104,6 +107,21 @@ class HuffmanSuite extends FunSuite {
   test("decode with example tree should decode 10001010 to bac") {
     new ExampleTree {
       assert(decode(egCode, List(1, 0, 0, 0, 1, 0, 1, 0)) === List('b', 'a', 'c'))
+    }
+  }
+
+  test("convert() should work for a tiny tree") {
+    new PersonalTree {
+      assert(convert(tinyTree) === List(('a', List(0)), ('b', List(1))))
+    }
+  }
+
+  test("convert() should work for a complex tree") {
+    new ExampleTree {
+      val codeTree = convert(egCode).toMap
+      assert(codeTree('b') === List(1, 0, 0))
+      assert(codeTree('e') === List(1, 1, 0, 0))
+      assert(codeTree('g') === List(1, 1, 1, 0))
     }
   }
 }
