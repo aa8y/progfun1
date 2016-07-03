@@ -124,4 +124,13 @@ class HuffmanSuite extends FunSuite {
       assert(codeTree('g') === List(1, 1, 1, 0))
     }
   }
+
+  test("encode() and quickEncode() should give the same result") {
+    new ExampleTree {
+      val bac = "bac".toList
+      assert(encode(egCode)(bac) === quickEncode(egCode)(bac))
+      val baccha = "baccha".toList
+      assert(encode(egCode)(baccha) === quickEncode(egCode)(baccha))
+    }
+  }
 }
