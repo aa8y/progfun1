@@ -70,7 +70,9 @@ object Anagrams {
     .map { case (occ, group) => (occ, group.map(_._2)) }
 
   /** Returns all the anagrams of a given word. */
-  def wordAnagrams(word: Word): List[Word] = ???
+  def wordAnagrams(word: Word): List[Word] = {
+    (dictionaryByOccurrences withDefaultValue Nil)(wordOccurrences(word))
+  }
 
   /** Returns the list of all subsets of the occurrence list.
    *  This includes the occurrence itself, i.e. `List(('k', 1), ('o', 1))`
@@ -94,7 +96,27 @@ object Anagrams {
    *  Note that the order of the occurrence list subsets does not matter -- the subsets
    *  in the example above could have been displayed in some other order.
    */
-  def combinations(occurrences: Occurrences): List[Occurrences] = ???
+  def combinations(occurrences: Occurrences): List[Occurrences] = {
+    def subsets(pair: (Char, Int)): List[Occurrences] = pair match {
+      case (ltr, count) => { for (i <- 1 to count) yield List((ltr, i)) }.toList
+    }
+    occurrences match {
+      case Nil => List(List())
+      case x :: Nil => subsets(x) ::: combinations(Nil)
+      case x1 :: x2 :: Nil =>
+        val x1Subsets = subsets(x1)
+        val x2Subsets = subsets(x2)
+        val x12Subsets = for {
+          x1Subset <- x1Subsets
+          x2Subset <- x2Subsets
+        } yield x1Subset ::: x2Subset
+        x1Subsets ::: x2Subsets ::: x12Subsets ::: combinations(Nil)
+      case x :: xs => for {
+        pairSubset <- subsets(x)
+        occSubset <- combinations(xs)
+      } yield pairSubset ::: occSubset
+    }
+  }
 
   /** Subtracts occurrence list `y` from occurrence list `x`.
    *
