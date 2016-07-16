@@ -109,14 +109,14 @@ object Anagrams {
         val x12Subsets = for {
           x1Subset <- x1Subsets
           x2Subset <- x2Subsets
-        } yield (x1Subset ::: x2Subset).sorted
+        } yield x1Subset ::: x2Subset
         combinations(Nil) ::: x1Subsets ::: x2Subsets ::: x12Subsets
       case x :: xs =>
         val xsSubsets = combinations(xs)
         val xxsSubsets = for {
           pairSubset <- subsets(x)
           occSubset <- xsSubsets
-        } yield (pairSubset ::: occSubset).sorted
+        } yield pairSubset ::: occSubset
         xsSubsets ::: xxsSubsets
     }
   }
