@@ -102,19 +102,22 @@ object Anagrams {
     }
     occurrences match {
       case Nil => List(List())
-      case x :: Nil => subsets(x) ::: combinations(Nil)
+      case x :: Nil => combinations(Nil) ::: subsets(x)
       case x1 :: x2 :: Nil =>
         val x1Subsets = subsets(x1)
         val x2Subsets = subsets(x2)
         val x12Subsets = for {
           x1Subset <- x1Subsets
           x2Subset <- x2Subsets
-        } yield x1Subset ::: x2Subset
-        x1Subsets ::: x2Subsets ::: x12Subsets ::: combinations(Nil)
-      case x :: xs => for {
-        pairSubset <- subsets(x)
-        occSubset <- combinations(xs)
-      } yield pairSubset ::: occSubset
+        } yield (x1Subset ::: x2Subset).sorted
+        combinations(Nil) ::: x1Subsets ::: x2Subsets ::: x12Subsets
+      case x :: xs =>
+        val xsSubsets = combinations(xs)
+        val xxsSubsets = for {
+          pairSubset <- subsets(x)
+          occSubset <- xsSubsets
+        } yield (pairSubset ::: occSubset).sorted
+        xsSubsets ::: xxsSubsets
     }
   }
 
