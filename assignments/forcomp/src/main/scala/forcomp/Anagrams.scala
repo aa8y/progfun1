@@ -49,6 +49,8 @@ object Anagrams {
     .map { case (ltr, group) => (ltr, group.map(_._2).reduce(_ + _)) }
     .sorted
 
+  lazy val dictWordOccurrences = dictionary.map { case w => (w, wordOccurrences(w)) }.toMap
+
   /** The `dictionaryByOccurrences` is a `Map` from different occurrences to a sequence of all
    *  the words that have that occurrence count.
    *  This map serves as an easy way to obtain all the anagrams of a word given its occurrence list.
@@ -64,10 +66,9 @@ object Anagrams {
    *    List(('a', 1), ('e', 1), ('t', 1)) -> Seq("ate", "eat", "tea")
    *
    */
-  lazy val dictionaryByOccurrences: Map[Occurrences, List[Word]] = dictionary
-    .map { case w => (wordOccurrences(w), w) }
-    .groupBy { case (occ, _) => occ }
-    .map { case (occ, group) => (occ, group.map(_._2)) }
+  lazy val dictionaryByOccurrences: Map[Occurrences, List[Word]] = dictWordOccurrences
+    .groupBy { case (_, occ) => occ }
+    .map { case (occ, group) => (occ, group.map(_._1).toList) }
 
   /** Returns all the anagrams of a given word. */
   def wordAnagrams(word: Word): List[Word] = {
@@ -121,6 +122,16 @@ object Anagrams {
     }
   }
 
+  def isSubset(set: Occurrences, subset: Occurrences): Boolean = {
+    val setMap = set.toMap
+    subset.forall { case (ltr, subsetCount) =>
+      setMap.get(ltr) match {
+        case Some(setCount) => setCount >= subsetCount
+        case None => false
+      }
+    }
+  }
+
   /** Subtracts occurrence list `y` from occurrence list `x`.
    *
    *  The precondition is that the occurrence list `y` is a subset of
@@ -131,7 +142,17 @@ object Anagrams {
    *  Note: the resulting value is an occurrence - meaning it is sorted
    *  and has no zero-entries.
    */
-  def subtract(x: Occurrences, y: Occurrences): Occurrences = ???
+  def subtract(x: Occurrences, y: Occurrences): Occurrences = {
+    if (!isSubset(x, y)) throw new Exception("y is not a subset of x.")
+    if (x == y) Nil
+    else {
+      val yMap = y.toMap withDefaultValue 0
+      x.flatMap { case (ltr, count) => 
+        val newCount = count - yMap(ltr)
+        if (newCount == 0) None else Some(ltr, newCount)
+      }
+    }
+  }
 
   /** Returns a list of all anagram sentences of the given sentence.
    *
@@ -174,4 +195,12 @@ object Anagrams {
    *  Note: There is only one anagram of an empty sentence.
    */
   def sentenceAnagrams(sentence: Sentence): List[Sentence] = ???
+  /*
+  {
+    if (sentence.isEmpty) List(Nil)
+    else {
+      val sentenceOcc = sentenceOccurrences(sentence)
+    }
+  }
+  */
 }
