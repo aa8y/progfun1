@@ -49,8 +49,6 @@ object Anagrams {
     .map { case (ltr, group) => (ltr, group.map(_._2).reduce(_ + _)) }
     .sorted
 
-  lazy val dictWordOccurrences = dictionary.map { case w => (w, wordOccurrences(w)) }.toMap
-
   /** The `dictionaryByOccurrences` is a `Map` from different occurrences to a sequence of all
    *  the words that have that occurrence count.
    *  This map serves as an easy way to obtain all the anagrams of a word given its occurrence list.
@@ -66,9 +64,10 @@ object Anagrams {
    *    List(('a', 1), ('e', 1), ('t', 1)) -> Seq("ate", "eat", "tea")
    *
    */
-  lazy val dictionaryByOccurrences: Map[Occurrences, List[Word]] = dictWordOccurrences
-    .groupBy { case (_, occ) => occ }
-    .map { case (occ, group) => (occ, group.map(_._1).toList) }
+  lazy val dictionaryByOccurrences: Map[Occurrences, List[Word]] = dictionary
+    .map { case w => (wordOccurrences(w), w) }
+    .groupBy { case (occ, _) => occ }
+    .map { case (occ, group) => (occ, group.map(_._2)) }
 
   /** Returns all the anagrams of a given word. */
   def wordAnagrams(word: Word): List[Word] = {
@@ -147,7 +146,7 @@ object Anagrams {
     if (x == y) Nil
     else {
       val yMap = y.toMap withDefaultValue 0
-      x.flatMap { case (ltr, count) => 
+      x.flatMap { case (ltr, count) =>
         val newCount = count - yMap(ltr)
         if (newCount == 0) None else Some(ltr, newCount)
       }
@@ -194,13 +193,21 @@ object Anagrams {
    *
    *  Note: There is only one anagram of an empty sentence.
    */
-  def sentenceAnagrams(sentence: Sentence): List[Sentence] = ???
-  /*
-  {
-    if (sentence.isEmpty) List(Nil)
-    else {
-      val sentenceOcc = sentenceOccurrences(sentence)
+  def sentenceAnagrams(sentence: Sentence): List[Sentence] = {
+    def loop(sentenceOcc: Occurrences): List[Sentence] = {
+      if (sentenceOcc.isEmpty) List(Nil)
+      else {
+        val allOcc = combinations(sentenceOcc)
+        val validOcc = allOcc.filter(dictionaryByOccurrences.contains)
+        validOcc.flatMap { occ =>
+          val remOcc = subtract(sentenceOcc, occ)
+          dictionaryByOccurrences(occ).flatMap { word =>
+            loop(remOcc).map(_ :+ word)
+          }
+        }
+      }
     }
+    val sentenceOcc = sentenceOccurrences(sentence)
+    loop(sentenceOcc)
   }
-  */
 }
